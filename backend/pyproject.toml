@@ -25,6 +25,7 @@ exclude = [
     "node_modules",
     "venv",
     "migrations",
+    "alembic",
 ]
 
 line-length = 88
