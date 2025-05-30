@@ -1,0 +1,29 @@
+# Next.js specific
+.next/
+out/
+
+# Standard ignores
+node_modules/
+build/
+dist/
+coverage/
+
+# Config files (if you don't want Prettier to format them, though it often can)
+# .prettierrc.json
+# .eslintrc.json
+# next.config.js
+# postcss.config.js
+# tailwind.config.ts
+
+# Lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Other generated files or directories
+# *.log
