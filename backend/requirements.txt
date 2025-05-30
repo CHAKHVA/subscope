@@ -5,3 +5,9 @@ psycopg2-binary
 python-dotenv
 sqlalchemy
 alembic
+
+ruff
+
+pytest
+pytest-asyncio
+httpx
