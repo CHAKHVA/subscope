@@ -1,4 +1,3 @@
-
 # Created by https://www.gitignore.io/api/linux,macos,python,pycharm,windows,visualstudiocode
 # Edit at https://www.gitignore.io/?templates=linux,macos,python,pycharm,windows,visualstudiocode
 
@@ -276,3 +275,8 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.gitignore.io/api/linux,macos,python,pycharm,windows,visualstudiocode
+
+# Virtual environments
+.venv/
+venv/
+.env
