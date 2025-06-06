@@ -1,29 +1,30 @@
-import os
-
-from dotenv import load_dotenv
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-load_dotenv()
+from app.api.v1.api import api_router
+from app.core.config import settings
 
-app = FastAPI(title="Subscope API")
+app = FastAPI(
+    title=settings.PROJECT_NAME, openapi_url=f"{settings.API_V1_STR}/openapi.json"
+)
+
+# Set up CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
+
+app.include_router(api_router, prefix=settings.API_V1_STR)
 
 
 @app.get("/")
-async def read_root():
-    return {"message": "Welcome to Subscope API!"}
+def read_root():
+    return {"message": "Welcome to the FastAPI application!"}
 
 
 @app.get("/health")
-async def health_check():
-    # You can add a DB check here later
-    return {"status": "ok", "db_host": os.getenv("POSTGRES_HOST")}
-
-
-if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(
-        app,
-        host=os.getenv("API_HOST", "0.0.0.0"),
-        port=int(os.getenv("API_PORT", 80)),
-    )
+def health_check():
+    return {"status": "healthy"}
