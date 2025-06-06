@@ -1,0 +1,25 @@
+from datetime import date
+from decimal import Decimal
+from typing import Literal
+
+from pydantic import BaseModel, Field
+
+
+class SubscriptionBase(BaseModel):
+    name: str
+    amount: Decimal = Field(max_digits=10, decimal_places=2)
+    currency: str = "USD"
+    billing_cycle: Literal["monthly", "yearly"]
+    next_due_date: date
+
+
+class SubscriptionCreate(SubscriptionBase):
+    pass
+
+
+class SubscriptionUpdate(BaseModel):
+    name: str | None = None
+    amount: Decimal | None = Field(default=None, max_digits=10, decimal_places=2)
+    currency: str | None = None
+    billing_cycle: Literal["monthly", "yearly"] | None = None
+    next_due_date: date | None = None
