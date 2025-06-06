@@ -6,10 +6,10 @@ from app.models.tag import Tags
 from app.models.user import User
 
 __all__ = [
-    "User",
+    "NotificationLogs",
+    "Reminders",
+    "SubscriptionTags",
     "Subscriptions",
     "Tags",
-    "SubscriptionTags",
-    "Reminders",
-    "NotificationLogs",
+    "User",
 ]
