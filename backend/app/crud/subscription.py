@@ -1,12 +1,15 @@
-from sqlalchemy.orm import Session
 from fastapi import HTTPException
+from sqlalchemy.orm import Session
+
 from app.crud.base import CRUDBase
 from app.models import Subscriptions
 from app.schemas import SubscriptionCreate, SubscriptionUpdate
 
 
 class CRUDSubscription(CRUDBase[Subscriptions, SubscriptionCreate, SubscriptionUpdate]):
-    def create(self, db: Session, *, user_id: int, sub_in: SubscriptionCreate) -> Subscriptions:
+    def create(
+        self, db: Session, *, user_id: int, sub_in: SubscriptionCreate
+    ) -> Subscriptions:
         obj_data = sub_in.model_dump()
         obj_data["user_id"] = user_id
         return super().create(db, obj_in=obj_data)
@@ -26,7 +29,12 @@ class CRUDSubscription(CRUDBase[Subscriptions, SubscriptionCreate, SubscriptionU
         )
 
     def update(
-        self, db: Session, *, subscription_id: int, user_id: int, sub_in: SubscriptionUpdate
+        self,
+        db: Session,
+        *,
+        subscription_id: int,
+        user_id: int,
+        sub_in: SubscriptionUpdate,
     ) -> Subscriptions:
         db_obj = self.get(db, subscription_id)
         if db_obj is None or db_obj.user_id != user_id:
@@ -40,3 +48,6 @@ class CRUDSubscription(CRUDBase[Subscriptions, SubscriptionCreate, SubscriptionU
         db.delete(db_obj)
         db.commit()
         return True
+
+
+subscription = CRUDSubscription(Subscriptions)
