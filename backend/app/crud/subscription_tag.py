@@ -5,7 +5,9 @@ from app.models.subscription_tag import SubscriptionTags
 from app.schemas.subscription_tag_link import SubscriptionTagLink
 
 
-class CRUDSubscriptionTag(CRUDBase[SubscriptionTags, SubscriptionTagLink, SubscriptionTagLink]):
+class CRUDSubscriptionTag(
+    CRUDBase[SubscriptionTags, SubscriptionTagLink, SubscriptionTagLink]
+):
     def create(self, db: Session, *, obj_in: SubscriptionTagLink) -> SubscriptionTags:
         db_obj = SubscriptionTags(
             subscription_id=obj_in.subscription_id,
@@ -38,31 +40,29 @@ class CRUDSubscriptionTag(CRUDBase[SubscriptionTags, SubscriptionTagLink, Subscr
             .all()
         )
 
-    def delete(
-        self, db: Session, *, subscription_id: int, tag_id: int
-    ) -> bool:
-        result = db.query(self.model).filter(
-            self.model.subscription_id == subscription_id,
-            self.model.tag_id == tag_id,
-        ).delete()
+    def delete(self, db: Session, *, subscription_id: int, tag_id: int) -> bool:
+        result = (
+            db.query(self.model)
+            .filter(
+                self.model.subscription_id == subscription_id,
+                self.model.tag_id == tag_id,
+            )
+            .delete()
+        )
         db.commit()
         return result > 0
 
-    def delete_subscription_tags(
-        self, db: Session, *, subscription_id: int
-    ) -> bool:
-        result = db.query(self.model).filter(
-            self.model.subscription_id == subscription_id
-        ).delete()
+    def delete_subscription_tags(self, db: Session, *, subscription_id: int) -> bool:
+        result = (
+            db.query(self.model)
+            .filter(self.model.subscription_id == subscription_id)
+            .delete()
+        )
         db.commit()
         return result > 0
 
-    def delete_tag_subscriptions(
-        self, db: Session, *, tag_id: int
-    ) -> bool:
-        result = db.query(self.model).filter(
-            self.model.tag_id == tag_id
-        ).delete()
+    def delete_tag_subscriptions(self, db: Session, *, tag_id: int) -> bool:
+        result = db.query(self.model).filter(self.model.tag_id == tag_id).delete()
         db.commit()
         return result > 0
 
