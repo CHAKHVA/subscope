@@ -24,8 +24,7 @@ def get_db() -> Generator[Session, None, None]:
 
 
 def get_current_user(
-    db: Annotated[Session, Depends(get_db)],
-    token: Annotated[str, Depends(security)]
+    db: Annotated[Session, Depends(get_db)], token: Annotated[str, Depends(security)]
 ) -> User:
     """Get current user from JWT token."""
     credentials_exception = HTTPException(
@@ -52,7 +51,7 @@ def get_current_user(
 
 
 def get_current_active_user(
-    current_user: Annotated[User, Depends(get_current_user)]
+    current_user: Annotated[User, Depends(get_current_user)],
 ) -> User:
     """Get current active user."""
     if not crud.user.is_active(current_user):
