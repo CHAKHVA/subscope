@@ -13,8 +13,8 @@ class Settings(BaseSettings):
     DEBUG: bool = True
 
     # Database
-    DATABASE_URL: PostgresDsn
-    DATABASE_URL_TEST: PostgresDsn | None = None
+    DATABASE_URL: str
+    DATABASE_URL_TEST: str | None = None
 
     # CORS
     BACKEND_CORS_ORIGINS: list[AnyHttpUrl] = []
