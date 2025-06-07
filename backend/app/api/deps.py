@@ -33,7 +33,7 @@ def get_current_user(
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    
+
     try:
         payload = jwt.decode(
             token.credentials, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
@@ -43,8 +43,8 @@ def get_current_user(
             raise credentials_exception
         token_data = schemas.TokenPayload(sub=int(user_id))
     except (JWTError, ValueError):
-        raise credentials_exception
-    
+        raise credentials_exception from None
+
     user = crud.user.get(db, id=token_data.sub)
     if user is None:
         raise credentials_exception

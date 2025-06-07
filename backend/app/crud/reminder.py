@@ -1,5 +1,4 @@
 from datetime import datetime, timezone
-from typing import List, Optional
 
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
@@ -12,7 +11,7 @@ from app.schemas.reminder import ReminderCreate, ReminderUpdate
 class CRUDReminder(CRUDBase[Reminders, ReminderCreate, ReminderUpdate]):
     def get_by_subscription(
         self, db: Session, *, subscription_id: int
-    ) -> List[Reminders]:
+    ) -> list[Reminders]:
         """Get all reminders for a specific subscription."""
         return (
             db.query(self.model)
@@ -21,17 +20,17 @@ class CRUDReminder(CRUDBase[Reminders, ReminderCreate, ReminderUpdate]):
         )
 
     def get_pending_reminders(
-        self, db: Session, *, current_time: Optional[datetime] = None
-    ) -> List[Reminders]:
+        self, db: Session, *, current_time: datetime | None = None
+    ) -> list[Reminders]:
         """Get all pending reminders (not sent and due before current time)."""
         if current_time is None:
             current_time = datetime.now(timezone.utc)
-        
+
         return (
             db.query(self.model)
             .filter(
                 and_(
-                    self.model.sent == False,
+                    not self.model.sent,
                     self.model.remind_at <= current_time
                 )
             )
@@ -39,28 +38,28 @@ class CRUDReminder(CRUDBase[Reminders, ReminderCreate, ReminderUpdate]):
         )
 
     def get_sent_reminders(
-        self, db: Session, *, subscription_id: Optional[int] = None
-    ) -> List[Reminders]:
+        self, db: Session, *, subscription_id: int | None = None
+    ) -> list[Reminders]:
         """Get all sent reminders, optionally filtered by subscription."""
-        query = db.query(self.model).filter(self.model.sent == True)
-        
+        query = db.query(self.model).filter(self.model.sent)
+
         if subscription_id:
             query = query.filter(self.model.subscription_id == subscription_id)
-        
+
         return query.all()
 
     def get_recurring_reminders(
-        self, db: Session, *, subscription_id: Optional[int] = None
-    ) -> List[Reminders]:
+        self, db: Session, *, subscription_id: int | None = None
+    ) -> list[Reminders]:
         """Get all recurring reminders, optionally filtered by subscription."""
-        query = db.query(self.model).filter(self.model.is_recurring == True)
-        
+        query = db.query(self.model).filter(self.model.is_recurring)
+
         if subscription_id:
             query = query.filter(self.model.subscription_id == subscription_id)
-        
+
         return query.all()
 
-    def mark_as_sent(self, db: Session, *, reminder_id: int) -> Optional[Reminders]:
+    def mark_as_sent(self, db: Session, *, reminder_id: int) -> Reminders | None:
         """Mark a reminder as sent."""
         reminder = self.get(db, id=reminder_id)
         if reminder:
@@ -71,24 +70,24 @@ class CRUDReminder(CRUDBase[Reminders, ReminderCreate, ReminderUpdate]):
         return reminder
 
     def mark_multiple_as_sent(
-        self, db: Session, *, reminder_ids: List[int]
-    ) -> List[Reminders]:
+        self, db: Session, *, reminder_ids: list[int]
+    ) -> list[Reminders]:
         """Mark multiple reminders as sent."""
         reminders = (
             db.query(self.model)
             .filter(self.model.id.in_(reminder_ids))
             .all()
         )
-        
+
         for reminder in reminders:
             reminder.sent = True
             db.add(reminder)
-        
+
         db.commit()
-        
+
         for reminder in reminders:
             db.refresh(reminder)
-        
+
         return reminders
 
     def get_reminders_by_date_range(
@@ -97,9 +96,9 @@ class CRUDReminder(CRUDBase[Reminders, ReminderCreate, ReminderUpdate]):
         *,
         start_date: datetime,
         end_date: datetime,
-        subscription_id: Optional[int] = None,
+        subscription_id: int | None = None,
         include_sent: bool = True
-    ) -> List[Reminders]:
+    ) -> list[Reminders]:
         """Get reminders within a date range."""
         query = db.query(self.model).filter(
             and_(
@@ -107,27 +106,27 @@ class CRUDReminder(CRUDBase[Reminders, ReminderCreate, ReminderUpdate]):
                 self.model.remind_at <= end_date
             )
         )
-        
+
         if subscription_id:
             query = query.filter(self.model.subscription_id == subscription_id)
-        
+
         if not include_sent:
-            query = query.filter(self.model.sent == False)
-        
+            query = query.filter(not self.model.sent)
+
         return query.all()
 
     def get_overdue_reminders(
-        self, db: Session, *, current_time: Optional[datetime] = None
-    ) -> List[Reminders]:
+        self, db: Session, *, current_time: datetime | None = None
+    ) -> list[Reminders]:
         """Get overdue reminders (not sent and past due date)."""
         if current_time is None:
             current_time = datetime.now(timezone.utc)
-        
+
         return (
             db.query(self.model)
             .filter(
                 and_(
-                    self.model.sent == False,
+                    not self.model.sent,
                     self.model.remind_at < current_time
                 )
             )
@@ -136,7 +135,7 @@ class CRUDReminder(CRUDBase[Reminders, ReminderCreate, ReminderUpdate]):
 
     def reset_sent_status(
         self, db: Session, *, reminder_id: int
-    ) -> Optional[Reminders]:
+    ) -> Reminders | None:
         """Reset the sent status of a reminder (mark as not sent)."""
         reminder = self.get(db, id=reminder_id)
         if reminder:
@@ -148,7 +147,7 @@ class CRUDReminder(CRUDBase[Reminders, ReminderCreate, ReminderUpdate]):
 
     def update_remind_time(
         self, db: Session, *, reminder_id: int, new_remind_at: datetime
-    ) -> Optional[Reminders]:
+    ) -> Reminders | None:
         """Update the remind_at time for a specific reminder."""
         reminder = self.get(db, id=reminder_id)
         if reminder:
