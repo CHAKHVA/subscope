@@ -3,18 +3,21 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    APP_NAME: str = "Subscope"
+    VERSION: str = "1.0.0"
+    DEBUG: bool = True
+
     API_V1_STR: str = "/api/v1"
+
     SECRET_KEY: str
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
-    PROJECT_NAME: str
-    ENVIRONMENT: str = "development"
-    DEBUG: bool = True
-
     # Database
     DATABASE_URL: str
     DATABASE_URL_TEST: str | None = None
+
+    ENVIRONMENT: str = "development"
 
     # CORS
     BACKEND_CORS_ORIGINS: list[AnyHttpUrl] = []
