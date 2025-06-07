@@ -9,5 +9,5 @@ __all__ = [
     "CRUDReminder",
     "CRUDSubscription",
     "CRUDTag",
-    "CRUDUser"
+    "CRUDUser",
 ]

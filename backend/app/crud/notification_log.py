@@ -78,12 +78,7 @@ class CRUDNotificationLog(
         if status:
             query = query.filter(self.model.status == status)
 
-        return (
-            query.order_by(self.model.sent_at.desc())
-            .offset(skip)
-            .limit(limit)
-            .all()
-        )
+        return query.order_by(self.model.sent_at.desc()).offset(skip).limit(limit).all()
 
     def get_recent_logs(
         self, db: Session, *, hours: int = 24, skip: int = 0, limit: int = 100
@@ -181,9 +176,7 @@ class CRUDNotificationLog(
     def delete_by_reminder(self, db: Session, *, reminder_id: int) -> int:
         """Delete all notification logs for a specific reminder."""
         deleted_count = (
-            db.query(self.model)
-            .filter(self.model.reminder_id == reminder_id)
-            .delete()
+            db.query(self.model).filter(self.model.reminder_id == reminder_id).delete()
         )
         db.commit()
         return deleted_count
