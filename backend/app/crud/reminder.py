@@ -1,0 +1,175 @@
+from datetime import datetime, timezone
+from typing import List, Optional
+
+from sqlalchemy import and_
+from sqlalchemy.orm import Session
+
+from app.crud.base import CRUDBase
+from app.models.reminder import Reminders
+from app.schemas.reminder import ReminderCreate, ReminderUpdate
+
+
+class CRUDReminder(CRUDBase[Reminders, ReminderCreate, ReminderUpdate]):
+    def get_by_subscription(
+        self, db: Session, *, subscription_id: int
+    ) -> List[Reminders]:
+        """Get all reminders for a specific subscription."""
+        return (
+            db.query(self.model)
+            .filter(self.model.subscription_id == subscription_id)
+            .all()
+        )
+
+    def get_pending_reminders(
+        self, db: Session, *, current_time: Optional[datetime] = None
+    ) -> List[Reminders]:
+        """Get all pending reminders (not sent and due before current time)."""
+        if current_time is None:
+            current_time = datetime.now(timezone.utc)
+        
+        return (
+            db.query(self.model)
+            .filter(
+                and_(
+                    self.model.sent == False,
+                    self.model.remind_at <= current_time
+                )
+            )
+            .all()
+        )
+
+    def get_sent_reminders(
+        self, db: Session, *, subscription_id: Optional[int] = None
+    ) -> List[Reminders]:
+        """Get all sent reminders, optionally filtered by subscription."""
+        query = db.query(self.model).filter(self.model.sent == True)
+        
+        if subscription_id:
+            query = query.filter(self.model.subscription_id == subscription_id)
+        
+        return query.all()
+
+    def get_recurring_reminders(
+        self, db: Session, *, subscription_id: Optional[int] = None
+    ) -> List[Reminders]:
+        """Get all recurring reminders, optionally filtered by subscription."""
+        query = db.query(self.model).filter(self.model.is_recurring == True)
+        
+        if subscription_id:
+            query = query.filter(self.model.subscription_id == subscription_id)
+        
+        return query.all()
+
+    def mark_as_sent(self, db: Session, *, reminder_id: int) -> Optional[Reminders]:
+        """Mark a reminder as sent."""
+        reminder = self.get(db, id=reminder_id)
+        if reminder:
+            reminder.sent = True
+            db.add(reminder)
+            db.commit()
+            db.refresh(reminder)
+        return reminder
+
+    def mark_multiple_as_sent(
+        self, db: Session, *, reminder_ids: List[int]
+    ) -> List[Reminders]:
+        """Mark multiple reminders as sent."""
+        reminders = (
+            db.query(self.model)
+            .filter(self.model.id.in_(reminder_ids))
+            .all()
+        )
+        
+        for reminder in reminders:
+            reminder.sent = True
+            db.add(reminder)
+        
+        db.commit()
+        
+        for reminder in reminders:
+            db.refresh(reminder)
+        
+        return reminders
+
+    def get_reminders_by_date_range(
+        self,
+        db: Session,
+        *,
+        start_date: datetime,
+        end_date: datetime,
+        subscription_id: Optional[int] = None,
+        include_sent: bool = True
+    ) -> List[Reminders]:
+        """Get reminders within a date range."""
+        query = db.query(self.model).filter(
+            and_(
+                self.model.remind_at >= start_date,
+                self.model.remind_at <= end_date
+            )
+        )
+        
+        if subscription_id:
+            query = query.filter(self.model.subscription_id == subscription_id)
+        
+        if not include_sent:
+            query = query.filter(self.model.sent == False)
+        
+        return query.all()
+
+    def get_overdue_reminders(
+        self, db: Session, *, current_time: Optional[datetime] = None
+    ) -> List[Reminders]:
+        """Get overdue reminders (not sent and past due date)."""
+        if current_time is None:
+            current_time = datetime.now(timezone.utc)
+        
+        return (
+            db.query(self.model)
+            .filter(
+                and_(
+                    self.model.sent == False,
+                    self.model.remind_at < current_time
+                )
+            )
+            .all()
+        )
+
+    def reset_sent_status(
+        self, db: Session, *, reminder_id: int
+    ) -> Optional[Reminders]:
+        """Reset the sent status of a reminder (mark as not sent)."""
+        reminder = self.get(db, id=reminder_id)
+        if reminder:
+            reminder.sent = False
+            db.add(reminder)
+            db.commit()
+            db.refresh(reminder)
+        return reminder
+
+    def update_remind_time(
+        self, db: Session, *, reminder_id: int, new_remind_at: datetime
+    ) -> Optional[Reminders]:
+        """Update the remind_at time for a specific reminder."""
+        reminder = self.get(db, id=reminder_id)
+        if reminder:
+            reminder.remind_at = new_remind_at
+            db.add(reminder)
+            db.commit()
+            db.refresh(reminder)
+        return reminder
+
+    def delete_by_subscription(
+        self, db: Session, *, subscription_id: int
+    ) -> int:
+        """Delete all reminders for a specific subscription."""
+        deleted_count = (
+            db.query(self.model)
+            .filter(self.model.subscription_id == subscription_id)
+            .delete()
+        )
+        db.commit()
+        return deleted_count
+
+
+# Create an instance of the CRUD class
+reminder = CRUDReminder(Reminders)
