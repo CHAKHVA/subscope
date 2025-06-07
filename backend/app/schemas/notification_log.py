@@ -1,6 +1,7 @@
 from datetime import datetime
-from pydantic import BaseModel
 from typing import Literal
+
+from pydantic import BaseModel
 
 
 class NotificationLogBase(BaseModel):
@@ -20,4 +21,4 @@ class NotificationLogResponse(NotificationLogBase):
     sent_at: datetime
 
     class Config:
-        from_attributes = True 
+        from_attributes = True
