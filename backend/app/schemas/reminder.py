@@ -22,7 +22,7 @@ class ReminderResponse(ReminderBase):
     id: int
     subscription_id: int
     sent: bool
-    created_at: int
+    created_at: datetime
 
     class Config:
         orm_mode = True
