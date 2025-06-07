@@ -10,14 +10,12 @@ class CRUDBase[
     CreateSchemaType: BaseModel,
     UpdateSchemaType: BaseModel,
 ]:
-    def __init__(self, model: type[ModelType]):
+    def init(self, model: type[ModelType]):
         """
         CRUD object with default methods to Create, Read, Update, Delete (CRUD).
-
-        **Parameters**
-
-        * `model`: A SQLAlchemy model class
-        * `schema`: A Pydantic model (schema) class
+        Parameters
+        * model: A SQLAlchemy model class
+        * schema: A Pydantic model (schema) class
         """
         self.model = model
 
