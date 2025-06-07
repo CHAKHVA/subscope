@@ -3,6 +3,7 @@ from app.crud.reminder import CRUDReminder
 from app.crud.subscription import CRUDSubscription
 from app.crud.tag import CRUDTag
 from app.crud.user import CRUDUser
+from app.crud.subscription_tag import CRUDSubscriptionTag
 
 __all__ = [
     "CRUDNotificationLog",
@@ -10,4 +11,5 @@ __all__ = [
     "CRUDSubscription",
     "CRUDTag",
     "CRUDUser",
+    "CRUDSubscriptionTag",
 ]
