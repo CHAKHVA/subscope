@@ -17,6 +17,7 @@ on:
 jobs:
   lint-and-test:
     runs-on: ubuntu-latest
+    environment: development
     defaults:
       run:
         working-directory: ./backend
@@ -49,8 +50,21 @@ jobs:
       - name: Run Pytest
         run: pytest
         env:
-          SECRET_KEY: "test-secret-key-for-ci"
-          PROJECT_NAME: "Subscope"
-          DATABASE_URL: "sqlite:///./test.db"
-          DATABASE_URL_TEST: "sqlite:///./test.db"
-          ENVIRONMENT: "development"
+          # Repository secrets
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          ALGORITHM: ${{ secrets.ALGORITHM }}
+          ACCESS_TOKEN_EXPIRE_MINUTES: ${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}
+
+          # Environment secrets
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+          POSTGRES_PORT: ${{ secrets.POSTGRES_PORT }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          FIRST_SUPERUSER: ${{ secrets.FIRST_SUPERUSER }}
+          FIRST_SUPERUSER_PASSWORD: ${{ secrets.FIRST_SUPERUSER_PASSWORD }}
+
+          # Repository variables
+          ENVIRONMENT: ${{ vars.ENVIRONMENT }}
+          BACKEND_CORS_ORIGINS: ${{ vars.BACKEND_CORS_ORIGINS }}
