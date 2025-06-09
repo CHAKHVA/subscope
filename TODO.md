@@ -64,7 +64,7 @@
 
 ## Sprint 5: Reminder Backend Logic & Scheduling
 
-- [ ] **Task 5.1 (Backend):** `reminders` table migration (subscription_id, remind_at, is_recurring, sent).
+- [ ] **Task 5.1 (Backend):** `reminders` table migration (subscription_id, remind_at, is_recurring, is_sent).
 - [ ] **Task 5.2 (Backend):** `notification_logs` table migration (reminder_id, channel, status, message, error, sent_at).
 - [ ] **Task 5.3 (Backend):** Pydantic schemas for Reminder and NotificationLog.
 - [ ] **Task 5.4 (Backend):** Implement logic to automatically create initial `reminders` when a `subscription` is created/updated (e.g., 7 days before `next_due_date`).

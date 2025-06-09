@@ -87,7 +87,7 @@ reminders (
   subscription_id UUID REFERENCES subscriptions(id) ON DELETE CASCADE,
   remind_at TIMESTAMP NOT NULL,
   is_recurring BOOLEAN DEFAULT TRUE,
-  sent BOOLEAN DEFAULT FALSE,
+  is_sent BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP DEFAULT now()
 )
 ```

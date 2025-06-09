@@ -15,13 +15,13 @@ class ReminderCreate(ReminderBase):
 class ReminderUpdate(BaseModel):
     remind_at: datetime | None = None
     is_recurring: bool | None = None
-    sent: bool | None = None
+    is_sent: bool | None = None
 
 
 class ReminderResponse(ReminderBase):
     id: int
     subscription_id: int
-    sent: bool
+    is_sent: bool
     created_at: datetime
 
     class Config:

@@ -28,7 +28,7 @@ class CRUDReminder(CRUDBase[Reminders, ReminderCreate, ReminderUpdate]):
 
         return (
             db.query(self.model)
-            .filter(and_(not self.model.sent, self.model.remind_at <= current_time))
+            .filter(and_(not self.model.is_sent, self.model.remind_at <= current_time))
             .all()
         )
 
@@ -36,7 +36,7 @@ class CRUDReminder(CRUDBase[Reminders, ReminderCreate, ReminderUpdate]):
         self, db: Session, *, subscription_id: int | None = None
     ) -> list[Reminders]:
         """Get all sent reminders, optionally filtered by subscription."""
-        query = db.query(self.model).filter(self.model.sent)
+        query = db.query(self.model).filter(self.model.is_sent)
 
         if subscription_id:
             query = query.filter(self.model.subscription_id == subscription_id)
@@ -58,7 +58,7 @@ class CRUDReminder(CRUDBase[Reminders, ReminderCreate, ReminderUpdate]):
         """Mark a reminder as sent."""
         reminder = self.get(db, id=reminder_id)
         if reminder:
-            reminder.sent = True
+            reminder.is_sent = True
             db.add(reminder)
             db.commit()
             db.refresh(reminder)
@@ -71,7 +71,7 @@ class CRUDReminder(CRUDBase[Reminders, ReminderCreate, ReminderUpdate]):
         reminders = db.query(self.model).filter(self.model.id.in_(reminder_ids)).all()
 
         for reminder in reminders:
-            reminder.sent = True
+            reminder.is_sent = True
             db.add(reminder)
 
         db.commit()
@@ -99,7 +99,7 @@ class CRUDReminder(CRUDBase[Reminders, ReminderCreate, ReminderUpdate]):
             query = query.filter(self.model.subscription_id == subscription_id)
 
         if not include_sent:
-            query = query.filter(not self.model.sent)
+            query = query.filter(not self.model.is_sent)
 
         return query.all()
 
@@ -112,7 +112,7 @@ class CRUDReminder(CRUDBase[Reminders, ReminderCreate, ReminderUpdate]):
 
         return (
             db.query(self.model)
-            .filter(and_(not self.model.sent, self.model.remind_at < current_time))
+            .filter(and_(not self.model.is_sent, self.model.remind_at < current_time))
             .all()
         )
 
@@ -120,7 +120,7 @@ class CRUDReminder(CRUDBase[Reminders, ReminderCreate, ReminderUpdate]):
         """Reset the sent status of a reminder (mark as not sent)."""
         reminder = self.get(db, id=reminder_id)
         if reminder:
-            reminder.sent = False
+            reminder.is_sent = False
             db.add(reminder)
             db.commit()
             db.refresh(reminder)
