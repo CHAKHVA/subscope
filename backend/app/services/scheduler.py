@@ -41,7 +41,7 @@ class SchedulerService:
         db: Session = SessionLocal()
         try:
             # Get reminders that need to be sent
-            now = datetime.utcnow()
+            now = datetime.now(datetime.UTC)
             upcoming = now + timedelta(hours=1)
 
             reminders = crud_reminder.get_pending_reminders(
