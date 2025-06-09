@@ -1,15 +1,15 @@
 from sqlalchemy.orm import Session
 
 from app.crud.base import CRUDBase
-from app.models.subscription_tag import SubscriptionTags
+from app.models.subscription_tag import SubscriptionTag
 from app.schemas.subscription_tag_link import SubscriptionTagLink
 
 
 class CRUDSubscriptionTag(
-    CRUDBase[SubscriptionTags, SubscriptionTagLink, SubscriptionTagLink]
+    CRUDBase[SubscriptionTag, SubscriptionTagLink, SubscriptionTagLink]
 ):
-    def create(self, db: Session, *, obj_in: SubscriptionTagLink) -> SubscriptionTags:
-        db_obj = SubscriptionTags(
+    def create(self, db: Session, *, obj_in: SubscriptionTagLink) -> SubscriptionTag:
+        db_obj = SubscriptionTag(
             subscription_id=obj_in.subscription_id,
             tag_id=obj_in.tag_id,
         )
@@ -20,7 +20,7 @@ class CRUDSubscriptionTag(
 
     def get_subscription_tags(
         self, db: Session, *, subscription_id: int, skip: int = 0, limit: int = 100
-    ) -> list[SubscriptionTags]:
+    ) -> list[SubscriptionTag]:
         return (
             db.query(self.model)
             .filter(self.model.subscription_id == subscription_id)
@@ -31,7 +31,7 @@ class CRUDSubscriptionTag(
 
     def get_tag_subscriptions(
         self, db: Session, *, tag_id: int, skip: int = 0, limit: int = 100
-    ) -> list[SubscriptionTags]:
+    ) -> list[SubscriptionTag]:
         return (
             db.query(self.model)
             .filter(self.model.tag_id == tag_id)
@@ -67,4 +67,4 @@ class CRUDSubscriptionTag(
         return result > 0
 
 
-subscription_tag = CRUDSubscriptionTag(SubscriptionTags)
+subscription_tag = CRUDSubscriptionTag(SubscriptionTag)

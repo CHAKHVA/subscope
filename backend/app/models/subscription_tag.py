@@ -4,7 +4,7 @@ from sqlalchemy.orm import relationship
 from app.core.database import Base
 
 
-class SubscriptionTags(Base):
+class SubscriptionTag(Base):
     __tablename__ = "subscription_tags"
 
     subscription_id = Column(

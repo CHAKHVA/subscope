@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship
 from app.core.database import Base
 
 
-class NotificationLogs(Base):
+class NotificationLog(Base):
     __tablename__ = "notification_logs"
 
     id = Column(Integer, primary_key=True, autoincrement=True)

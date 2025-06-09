@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship
 from app.core.database import Base
 
 
-class Reminders(Base):
+class Reminder(Base):
     __tablename__ = "reminders"
 
     id = Column(Integer, primary_key=True, autoincrement=True)

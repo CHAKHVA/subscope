@@ -4,16 +4,16 @@ from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
 from app.crud.base import CRUDBase
-from app.models.notification_log import NotificationLogs
+from app.models.notification_log import NotificationLog
 from app.schemas.notification_log import NotificationLogCreate, NotificationLogUpdate
 
 
 class CRUDNotificationLog(
-    CRUDBase[NotificationLogs, NotificationLogCreate, NotificationLogUpdate]
+    CRUDBase[NotificationLog, NotificationLogCreate, NotificationLogUpdate]
 ):
     def get_by_reminder(
         self, db: Session, *, reminder_id: int
-    ) -> list[NotificationLogs]:
+    ) -> list[NotificationLog]:
         """Get all notification logs for a specific reminder."""
         return (
             db.query(self.model)
@@ -24,7 +24,7 @@ class CRUDNotificationLog(
 
     def get_by_status(
         self, db: Session, *, status: str, skip: int = 0, limit: int = 100
-    ) -> list[NotificationLogs]:
+    ) -> list[NotificationLog]:
         """Get notification logs by status (sent/failed)."""
         return (
             db.query(self.model)
@@ -37,19 +37,19 @@ class CRUDNotificationLog(
 
     def get_failed_notifications(
         self, db: Session, *, skip: int = 0, limit: int = 100
-    ) -> list[NotificationLogs]:
+    ) -> list[NotificationLog]:
         """Get all failed notification logs."""
         return self.get_by_status(db, status="failed", skip=skip, limit=limit)
 
     def get_sent_notifications(
         self, db: Session, *, skip: int = 0, limit: int = 100
-    ) -> list[NotificationLogs]:
+    ) -> list[NotificationLog]:
         """Get all successfully sent notification logs."""
         return self.get_by_status(db, status="sent", skip=skip, limit=limit)
 
     def get_by_channel(
         self, db: Session, *, channel: str, skip: int = 0, limit: int = 100
-    ) -> list[NotificationLogs]:
+    ) -> list[NotificationLog]:
         """Get notification logs by channel (email)."""
         return (
             db.query(self.model)
@@ -69,7 +69,7 @@ class CRUDNotificationLog(
         status: str | None = None,
         skip: int = 0,
         limit: int = 100,
-    ) -> list[NotificationLogs]:
+    ) -> list[NotificationLog]:
         """Get notification logs within a date range."""
         query = db.query(self.model).filter(
             and_(self.model.sent_at >= start_date, self.model.sent_at <= end_date)
@@ -82,7 +82,7 @@ class CRUDNotificationLog(
 
     def get_recent_logs(
         self, db: Session, *, hours: int = 24, skip: int = 0, limit: int = 100
-    ) -> list[NotificationLogs]:
+    ) -> list[NotificationLog]:
         """Get notification logs from the last X hours."""
         current_time = datetime.now(timezone.utc)
         start_time = current_time.replace(hour=current_time.hour - hours)
@@ -100,7 +100,7 @@ class CRUDNotificationLog(
         status: str = "sent",
         message: str,
         error: str | None = None,
-    ) -> NotificationLogs:
+    ) -> NotificationLog:
         """Create a notification log entry."""
         log_data = NotificationLogCreate(
             reminder_id=reminder_id,
@@ -114,7 +114,7 @@ class CRUDNotificationLog(
 
     def mark_as_failed(
         self, db: Session, *, log_id: int, error_message: str
-    ) -> NotificationLogs | None:
+    ) -> NotificationLog | None:
         """Mark a notification log as failed with error message."""
         log = self.get(db, id=log_id)
         if log:
@@ -128,7 +128,7 @@ class CRUDNotificationLog(
 
     def get_retry_candidates(
         self, db: Session, *, max_age_hours: int = 24
-    ) -> list[NotificationLogs]:
+    ) -> list[NotificationLog]:
         """Get failed notifications that might be candidates for retry."""
         cutoff_time = datetime.now(timezone.utc).replace(
             hour=datetime.now(timezone.utc).hour - max_age_hours
@@ -145,7 +145,7 @@ class CRUDNotificationLog(
 
     def get_logs_with_errors(
         self, db: Session, *, skip: int = 0, limit: int = 100
-    ) -> list[NotificationLogs]:
+    ) -> list[NotificationLog]:
         """Get notification logs that have error messages."""
         return (
             db.query(self.model)
@@ -183,4 +183,4 @@ class CRUDNotificationLog(
 
 
 # Create an instance of the CRUD class
-notification_log = CRUDNotificationLog(NotificationLogs)
+notification_log = CRUDNotificationLog(NotificationLog)
