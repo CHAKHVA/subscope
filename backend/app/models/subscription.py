@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy import (
     CheckConstraint,
     Column,
@@ -8,27 +10,40 @@ from sqlalchemy import (
     Numeric,
     String,
 )
-from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
 
 from app.core.database import Base
 
 
-class Subscriptions(Base):
+class Subscription(Base):
     __tablename__ = "subscriptions"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+    name = Column(String, nullable=False)
+    amount = Column(Numeric(10, 2), nullable=False)
+    currency = Column(String, default="USD", nullable=False)
+    billing_cycle = Column(String, nullable=False)
+    next_due_date = Column(Date, nullable=False)
+    created_at = Column(DateTime, default=datetime.now(datetime.UTC))
+    updated_at = Column(
+        DateTime,
+        default=datetime.now(datetime.UTC),
+        onupdate=datetime.now(datetime.UTC),
+    )
+
     __table_args__ = (
         CheckConstraint(
             "billing_cycle IN ('monthly', 'yearly')", name="check_billing_cycle"
         ),
     )
 
-    id = Column(Integer, primary_key=True)
-    user_id = Column(
-        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    user = relationship("User", back_populates="subscriptions")
+    reminders = relationship(
+        "Reminder", back_populates="subscription", cascade="all, delete-orphan"
     )
-    name = Column(String, nullable=False)
-    amount = Column(Numeric(10, 2))
-    currency = Column(String, default="USD")
-    billing_cycle = Column(String)
-    next_due_date = Column(Date, nullable=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    subscription_tags = relationship(
+        "SubscriptionTag", back_populates="subscription", cascade="all, delete-orphan"
+    )
