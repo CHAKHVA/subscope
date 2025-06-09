@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class TagBase(BaseModel):
@@ -9,9 +9,12 @@ class TagCreate(TagBase):
     pass
 
 
-class TagResponse(TagBase):
+class TagInDB(TagBase):
     id: int
     user_id: int
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
+
+
+class Tag(TagInDB):
+    pass
